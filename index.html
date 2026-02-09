@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загадочная Игра</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            cursor: default;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Фон с гифкой */
+        .background {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: calc(100% + 40px);
+            height: calc(100% + 40px);
+            background: url('https://media.giphy.com/media/26tn33aiTi1jkl6H6/giphy.gif') center/cover no-repeat;
+            filter: blur(8px) brightness(0.7);
+            z-index: -2;
+            
+            /* Анимация слабого покачивания */
+            animation: gentleSway 15s infinite ease-in-out;
+        }
+
+        /* Виньетка (темное обрамление) */
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
+            z-index: -1;
+        }
+
+        /* Начальная анимация "открытия глаз" */
+        .eye-opening {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            animation: eyeOpen 3s ease-in-out forwards;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        /* Основной контент */
+        .content {
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            animation: fadeInUp 3s ease-out 1.5s forwards;
+            text-align: center;
+        }
+
+        /* Липкие (фиксированные) элементы */
+        .sticky {
+            position: fixed;
+            z-index: 100;
+            padding: 15px;
+            font-size: 14px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .top-left {
+            top: 0;
+            left: 0;
+        }
+
+        .top-center {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .top-right {
+            top: 0;
+            right: 0;
+        }
+
+        .bottom-left {
+            bottom: 0;
+            left: 0;
+        }
+
+        .bottom-right {
+            bottom: 0;
+            right: 0;
+        }
+
+        /* Заголовок игры */
+        .game-title {
+            font-size: 4.5rem;
+            margin-bottom: 20px;
+            text-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.3),
+                0 0 40px rgba(255, 255, 255, 0.2),
+                0 0 60px rgba(255, 255, 255, 0.1);
+            letter-spacing: 3px;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #cccccc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Мигающая инструкция */
+        .start-instruction {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            animation: blink 1.5s infinite;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Кнопка для мобильных устройств */
+        .mobile-start-btn {
+            display: none;
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .mobile-start-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Анимации */
+        @keyframes eyeOpen {
+            0% {
+                opacity: 1;
+            }
+            70% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0;
+                display: none;
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes gentleSway {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(-5px, -3px) scale(1.01);
+            }
+            66% {
+                transform: translate(3px, 2px) scale(1.005);
+            }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2.5rem;
+            }
+            
+            .start-instruction {
+                font-size: 1rem;
+            }
+            
+            .sticky {
+                font-size: 12px;
+                padding: 10px;
+            }
+            
+            .mobile-start-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .sticky {
+                font-size: 10px;
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Начальная анимация "открытия глаз" -->
+        <div class="eye-opening"></div>
+        
+        <!-- Фон с гифкой -->
+        <div class="background" id="background"></div>
+        <div class="vignette"></div>
+        
+        <!-- Липкие текстовые поля -->
+        <div class="sticky top-left">Уровень: Неизвестно</div>
+        <div class="sticky top-center">Время: 00:00:00</div>
+        <div class="sticky top-right">Сложность: ???</div>
+        
+        <div class="sticky bottom-left">Игрок: Гость</div>
+        <div class="sticky bottom-right">Версия: 0.1.0</div>
+        
+        <!-- Основной контент -->
+        <div class="content">
+            <h1 class="game-title">ТАЙНА БЕЗДНЫ</h1>
+            <div class="start-instruction">Нажмите ПРОБЕЛ чтобы начать</div>
+            <button class="mobile-start-btn" id="mobileStartBtn">Начать игру</button>
+        </div>
+    </div>
+
+    <!-- Аудио элемент (скрыт) -->
+    <audio id="backgroundAudio" loop>
+        <!-- Замените src на путь к вашему аудиофайлу -->
+        <source src="https://assets.mixkit.co/music/preview/mixkit-mysterious-night-443.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио элемент.
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const background = document.getElementById('background');
+            const audio = document.getElementById('backgroundAudio');
+            const mobileStartBtn = document.getElementById('mobileStartBtn');
+            
+            // Запуск аудио после взаимодействия пользователя
+            function startAudio() {
+                if (audio.paused) {
+                    audio.volume = 0.3; // Установите громкость на 30%
+                    audio.play().catch(e => console.log("Автовоспроизведение аудио заблокировано"));
+                }
+            }
+            
+            // Запуск аудио при первом клике на странице
+            document.addEventListener('click', startAudio, { once: true });
+            
+            // Запуск аудио при нажатии пробела
+            document.addEventListener('keydown', function(event) {
+                if (event.code === 'Space') {
+                    event.preventDefault();
+                    startAudio();
+                    startGame();
+                }
+            });
+            
+            // Запуск игры с кнопки для мобильных
+            mobileStartBtn.addEventListener('click', function() {
+                startAudio();
+                startGame();
+            });
+            
+            // Покачивание фона в сторону курсора
+            document.addEventListener('mousemove', function(event) {
+                const x = (event.clientX / window.innerWidth - 0.5) * 40;
+                const y = (event.clientY / window.innerHeight - 0.5) * 40;
+                
+                background.style.transform = `
+                    translate(${x}px, ${y}px) 
+                    scale(1.02)
+                `;
+            });
+            
+            // Сброс позиции фона когда курсор уходит
+            document.addEventListener('mouseleave', function() {
+                background.style.transform = 'translate(0, 0) scale(1)';
+            });
+            
+            // Функция начала игры (заглушка)
+            function startGame() {
+                // Здесь будет ваша логика начала игры
+                console.log("Игра началась!");
+                alert("Игра начинается! (Эта страница - только шаблон)");
+                
+                // Пример: переход на другую страницу
+                // window.location.href = "game.html";
+            }
+            
+            // Плавное появление липких элементов
+            setTimeout(() => {
+                const stickyElements = document.querySelectorAll('.sticky');
+                stickyElements.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, index * 300 + 2000);
+                });
+            }, 500);
+            
+            // Инициализация стилей для липких элементов
+            const stickyElements = document.querySelectorAll('.sticky');
+            stickyElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(-20px)';
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            });
+            
+            // Добавление параллакс эффекта при скролле (если контента больше)
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                background.style.transform = `translateY(${scrolled * 0.3}px)`;
+            });
+            
+            // Автозапуск аудио для некоторых браузеров (с ограничениями)
+            setTimeout(() => {
+                // Попытка запуска с задержкой
+                startAudio();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
